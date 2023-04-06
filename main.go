@@ -1,12 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
 	"t_chat/server"
-	"t_chat/structs"
+	"t_chat/utils"
 )
 
 type Options struct {
@@ -17,25 +16,14 @@ type Options struct {
 
 func init() {
 	// print logo
-	fmt.Fprintf(os.Stdout, structs.Onion_logo, structs.ColorGreen, structs.ColorWhite,
-		structs.ColorPurple, structs.ColorWhite,
-		structs.ColorPurple, structs.ColorWhite,
-		structs.ColorPurple, structs.ColorWhite,
-		structs.ColorPurple, structs.ColorWhite,
-		structs.ColorPurple, structs.ColorWhite,
-		structs.ColorPurple, structs.ColorWhite,
-		structs.ColorPurple, structs.ColorWhite,
-		structs.ColorPurple, structs.ColorWhite,
-		structs.ColorPurple, structs.ColorWhite,
-		structs.ColorPurple, structs.ColorWhite,
-		structs.ColorGreen, structs.ColorNone,
-	)
+	utils.PrintRandomLogo(os.Stdout)
 }
 
 /*
 TODO:
 	+ passwords for users
 	+ keys for users
+	+ setting up the number of threads for a room
 */
 
 func main() {

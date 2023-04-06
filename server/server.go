@@ -5,7 +5,7 @@ import (
 	"log"
 	"net"
 	"t_chat/rooms"
-	"t_chat/structs"
+	"t_chat/utils"
 
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/terminal"
@@ -115,19 +115,7 @@ func (s *Server) handleShell(channel ssh.Channel, username string) {
 
 	term := terminal.NewTerminal(channel, fmt.Sprintf("%s > ", username))
 	// print logo
-	fmt.Fprintf(term, structs.Onion_logo, structs.ColorGreen, structs.ColorWhite,
-		structs.ColorPurple, structs.ColorWhite,
-		structs.ColorPurple, structs.ColorWhite,
-		structs.ColorPurple, structs.ColorWhite,
-		structs.ColorPurple, structs.ColorWhite,
-		structs.ColorPurple, structs.ColorWhite,
-		structs.ColorPurple, structs.ColorWhite,
-		structs.ColorPurple, structs.ColorWhite,
-		structs.ColorPurple, structs.ColorWhite,
-		structs.ColorPurple, structs.ColorWhite,
-		structs.ColorPurple, structs.ColorWhite,
-		structs.ColorGreen, structs.ColorNone,
-	)
+	utils.PrintRandomLogo(term)
 	// Join main room
 	var currentRoom *rooms.Room
 	currentRoom, err := rooms.JoinRoom("main", rooms.User{Nickname: username, Terminal: term})
