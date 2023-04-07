@@ -81,11 +81,17 @@ func (s *Server) handleChannels(channels <-chan ssh.NewChannel, conn *ssh.Server
 		if err != nil {
 			continue
 		}
+		// check username
+		err = checkUsername(conn.User())
+		if err != nil {
+			channel.Write([]byte(fmt.Sprintf("incorrect username: %v\t", err)))
+			conn.Close()
+		}
 
 		go func(in <-chan *ssh.Request) {
 			defer channel.Close()
 			for req := range in {
-				log.Println("Request: ", req.Type, string(req.Payload))
+				// log.Println("Request: ", req.Type, string(req.Payload))
 
 				ok := false
 				switch req.Type {
@@ -105,7 +111,6 @@ func (s *Server) handleChannels(channels <-chan ssh.NewChannel, conn *ssh.Server
 				req.Reply(ok, nil)
 			}
 		}(requests)
-
 		go s.handleShell(channel, conn.User())
 	}
 }
@@ -139,7 +144,10 @@ func (s *Server) handleShell(channel ssh.Channel, username string) {
 					channel.Close()
 				case "/help":
 					term.Write([]byte(helpMessage))
+				case "/new_password":
+					log.Println(updateUserPassword(username, "qwerty"))
 				}
+				continue
 			}
 
 			// send message to room

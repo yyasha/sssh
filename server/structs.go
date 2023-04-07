@@ -15,4 +15,6 @@ type Server struct {
 
 var helpMessage string = `server commands:
 /help - show this message
-/exit - disconnect from the server`
+/exit - disconnect from the server
+/new_password - new password
+`
