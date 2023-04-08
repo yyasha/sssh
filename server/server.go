@@ -153,7 +153,12 @@ func (s *Server) handleShell(channel ssh.Channel, username string) {
 				case "/help":
 					term.Write([]byte(helpMessage))
 				case "/new_password":
-					updatePasswordRequest(term, username)
+					err = updatePasswordRequest(term, username)
+					if err != nil {
+						term.Write([]byte("your password not updated\n"))
+					}
+				default:
+					term.Write([]byte(helpMessage))
 				}
 				continue
 			}

@@ -80,9 +80,16 @@ func updatePasswordRequest(term *term.Terminal, username string) error {
 			term.Write([]byte("Passwords don't match\n"))
 			continue
 		}
-		err = updateUserPassword(username, pass_1)
-		if err != nil {
-			return err
+		if userExists(username) {
+			err = updateUserPassword(username, pass_1)
+			if err != nil {
+				return err
+			}
+		} else {
+			err = addPassword(username, pass_1)
+			if err != nil {
+				return err
+			}
 		}
 		term.Write([]byte("\nYour password updated\n\n"))
 		break
@@ -93,7 +100,7 @@ func updatePasswordRequest(term *term.Terminal, username string) error {
 // checking password for correctness
 func checkPassword(username, password string) (bool, error) {
 	// get user's hashed password
-	file, err := os.OpenFile(passwords_file, os.O_RDWR, 0600)
+	file, err := os.OpenFile(passwords_file, os.O_RDWR|os.O_CREATE, 0600)
 	if err != nil {
 		return false, err
 	}
@@ -113,7 +120,7 @@ func checkPassword(username, password string) (bool, error) {
 // check user exists
 func userExists(username string) bool {
 	// get file data
-	file, err := os.OpenFile(passwords_file, os.O_RDWR, 0600)
+	file, err := os.OpenFile(passwords_file, os.O_RDWR|os.O_CREATE, 0600)
 	if err != nil {
 		return false
 	}
@@ -138,7 +145,7 @@ func updateUserPassword(username, new_password string) error {
 		return err
 	}
 	// get passwords from file
-	file, err := os.OpenFile(passwords_file, os.O_RDWR, 0600)
+	file, err := os.OpenFile(passwords_file, os.O_RDWR|os.O_CREATE, 0600)
 	if err != nil {
 		return err
 	}

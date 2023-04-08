@@ -19,6 +19,7 @@ type Options struct {
 /*
 TODO:
 	+ keys for users
+	+ add rooms
 	+ cached passwords
 	+ setting up the number of threads for a room
 	+ notif that this username is used
@@ -33,7 +34,6 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	log.Printf("%+v", options)
 	// print logo
 	utils.PrintRandomLogo(os.Stdout)
 	// get server privkey from file
