@@ -7,10 +7,11 @@ import (
 )
 
 type Server struct {
-	sshConfig *ssh.ServerConfig
-	sshSigner *ssh.Signer
-	socket    *net.Listener
-	done      chan struct{}
+	passwordMode bool
+	sshConfig    *ssh.ServerConfig
+	sshSigner    *ssh.Signer
+	socket       *net.Listener
+	done         chan struct{}
 }
 
 var helpMessage string = `server commands:

@@ -12,7 +12,7 @@ import (
 )
 
 // Create server config
-func NewServer(privateKey []byte) (*Server, error) {
+func NewServer(privateKey []byte, passwordMode bool) (*Server, error) {
 	signer, err := ssh.ParsePrivateKey(privateKey)
 	if err != nil {
 		return nil, err
@@ -24,8 +24,9 @@ func NewServer(privateKey []byte) (*Server, error) {
 	config.AddHostKey(signer)
 
 	server := Server{
-		sshConfig: &config,
-		sshSigner: &signer,
+		sshConfig:    &config,
+		sshSigner:    &signer,
+		passwordMode: passwordMode,
 	}
 
 	return &server, nil
@@ -117,8 +118,15 @@ func (s *Server) handleChannels(channels <-chan ssh.NewChannel, conn *ssh.Server
 
 func (s *Server) handleShell(channel ssh.Channel, username string) {
 	defer channel.Close()
-
+	// create terminal
 	term := terminal.NewTerminal(channel, fmt.Sprintf("%s > ", username))
+	// check password
+	if s.passwordMode || userExists(username) {
+		err := passwordRequest(term, username)
+		if err != nil {
+			return
+		}
+	}
 	// print logo
 	utils.PrintRandomLogo(term)
 	// Join main room
@@ -126,7 +134,7 @@ func (s *Server) handleShell(channel ssh.Channel, username string) {
 	currentRoom, err := rooms.JoinRoom("main", rooms.User{Nickname: username, Terminal: term})
 	if err != nil {
 		log.Println("Room main not found")
-		term.Write([]byte("Room main not found"))
+		term.Write([]byte("Room main not found\n"))
 		return
 	}
 	// Recieve user input and send to room
@@ -141,11 +149,11 @@ func (s *Server) handleShell(channel ssh.Channel, username string) {
 			if string(line[0]) == "/" {
 				switch line {
 				case "/exit":
-					channel.Close()
+					return
 				case "/help":
 					term.Write([]byte(helpMessage))
 				case "/new_password":
-					log.Println(updateUserPassword(username, "qwerty"))
+					updatePasswordRequest(term, username)
 				}
 				continue
 			}

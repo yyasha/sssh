@@ -11,16 +11,15 @@ import (
 )
 
 type Options struct {
-	Verbose      []bool `short:"v" long:"verbose" description:"Show verbose logging."`
-	Host         string `short:"s" long:"host" description:"Host and port to listen on." default:"0.0.0.0:22"`
+	Host         string `short:"a" long:"host" description:"Host and port to listen on." default:"0.0.0.0:22"`
 	Identity     string `short:"i" long:"identity" description:"Private key to identify server with." default:"~/.ssh/id_rsa"`
 	PasswordMode bool   `short:"p" long:"password_mode" description:"Enable mandatory password mode"`
 }
 
 /*
 TODO:
-	+ passwords for users
 	+ keys for users
+	+ cached passwords
 	+ setting up the number of threads for a room
 	+ notif that this username is used
 	+ notif that user connected or disconnected
@@ -28,7 +27,6 @@ TODO:
 */
 
 func main() {
-	// {Bind: "0.0.0.0:2222", Identity: "/home/yash/ssh-key/t_chat"}
 	// parse arguments
 	var options Options
 	_, err := flags.ParseArgs(&options, os.Args)
@@ -45,7 +43,7 @@ func main() {
 		return
 	}
 	// create server
-	server, err := server.NewServer(privateKey)
+	server, err := server.NewServer(privateKey, options.PasswordMode)
 	if err != nil {
 		log.Println(err)
 		return
