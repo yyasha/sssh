@@ -11,9 +11,10 @@ import (
 )
 
 type Options struct {
-	Verbose  []bool `short:"v" long:"verbose" description:"Show verbose logging."`
-	Host     string `short:"s" long:"host" description:"Host and port to listen on." default:"0.0.0.0:22"`
-	Identity string `short:"i" long:"identity" description:"Private key to identify server with." default:"~/.ssh/id_rsa"`
+	Verbose      []bool `short:"v" long:"verbose" description:"Show verbose logging."`
+	Host         string `short:"s" long:"host" description:"Host and port to listen on." default:"0.0.0.0:22"`
+	Identity     string `short:"i" long:"identity" description:"Private key to identify server with." default:"~/.ssh/id_rsa"`
+	PasswordMode bool   `short:"p" long:"password_mode" description:"Enable mandatory password mode"`
 }
 
 /*
@@ -22,6 +23,7 @@ TODO:
 	+ keys for users
 	+ setting up the number of threads for a room
 	+ notif that this username is used
+	+ notif that user connected or disconnected
 	+ show message for joining users about online
 */
 
@@ -33,6 +35,7 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
+	log.Printf("%+v", options)
 	// print logo
 	utils.PrintRandomLogo(os.Stdout)
 	// get server privkey from file
