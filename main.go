@@ -11,15 +11,18 @@ import (
 )
 
 type Options struct {
-	Host         string `short:"a" long:"host" description:"Host and port to listen on." default:"0.0.0.0:22"`
+	Host         string `short:"b" long:"bind" description:"Host and port to listen on." default:"0.0.0.0:22"`
 	Identity     string `short:"i" long:"identity" description:"Private key to identify server with." default:"~/.ssh/id_rsa"`
 	PasswordMode bool   `short:"p" long:"password_mode" description:"Enable mandatory password mode"`
+	Whitelist    string `long:"whitelist" description:"Optional file of public keys who are allowed to connect."`
 }
 
 /*
 TODO:
 	+ keys for users
 	+ add rooms
+	+ add personal messages
+	+ @username
 	+ cached passwords
 	+ setting up the number of threads for a room
 	+ notif that this username is used
@@ -43,7 +46,7 @@ func main() {
 		return
 	}
 	// create server
-	server, err := server.NewServer(privateKey, options.PasswordMode)
+	server, err := server.NewServer(privateKey, options.PasswordMode, options.Whitelist)
 	if err != nil {
 		log.Println(err)
 		return

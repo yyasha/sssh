@@ -12,7 +12,7 @@ import (
 )
 
 // Create server config
-func NewServer(privateKey []byte, passwordMode bool) (*Server, error) {
+func NewServer(privateKey []byte, passwordMode bool, whitelist_dir string) (*Server, error) {
 	signer, err := ssh.ParsePrivateKey(privateKey)
 	if err != nil {
 		return nil, err
@@ -117,7 +117,10 @@ func (s *Server) handleChannels(channels <-chan ssh.NewChannel, conn *ssh.Server
 }
 
 func (s *Server) handleShell(channel ssh.Channel, username string) {
-	defer channel.Close()
+	defer func() {
+		channel.Close()
+		log.Println(username, "disconnected")
+	}()
 	// create terminal
 	term := terminal.NewTerminal(channel, fmt.Sprintf("%s > ", username))
 	// check password

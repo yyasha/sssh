@@ -42,19 +42,19 @@ func passwordRequest(term *term.Terminal, username string) error {
 	} else {
 		// create new password
 		for {
-			pass_1, err := term.ReadPassword("Enter new password: ")
+			pass, err := term.ReadPassword("Enter new password: ")
 			if err != nil {
 				return err
 			}
-			pass_2, err := term.ReadPassword("Сonfirm your password: ")
+			pass_c, err := term.ReadPassword("Сonfirm your password: ")
 			if err != nil {
 				return err
 			}
-			if pass_1 != pass_2 {
+			if pass != pass_c {
 				term.Write([]byte("Passwords don't match\n"))
 				continue
 			}
-			err = addPassword(username, pass_1)
+			err = addPassword(username, pass)
 			if err != nil {
 				return err
 			}
@@ -68,25 +68,25 @@ func passwordRequest(term *term.Terminal, username string) error {
 func updatePasswordRequest(term *term.Terminal, username string) error {
 	// update password
 	for {
-		pass_1, err := term.ReadPassword("Enter new password: ")
+		pass, err := term.ReadPassword("Enter new password: ")
 		if err != nil {
 			return err
 		}
-		pass_2, err := term.ReadPassword("Сonfirm your password: ")
+		pass_c, err := term.ReadPassword("Сonfirm your password: ")
 		if err != nil {
 			return err
 		}
-		if pass_1 != pass_2 {
+		if pass != pass_c {
 			term.Write([]byte("Passwords don't match\n"))
 			continue
 		}
 		if userExists(username) {
-			err = updateUserPassword(username, pass_1)
+			err = updateUserPassword(username, pass)
 			if err != nil {
 				return err
 			}
 		} else {
-			err = addPassword(username, pass_1)
+			err = addPassword(username, pass)
 			if err != nil {
 				return err
 			}
