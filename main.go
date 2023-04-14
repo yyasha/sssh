@@ -4,55 +4,49 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"t_chat/server"
-	"t_chat/utils"
-
-	"github.com/jessevdk/go-flags"
+	"sssh/options"
+	"sssh/server"
+	"sssh/utils"
 )
-
-type Options struct {
-	Host         string `short:"b" long:"bind" description:"Host and port to listen on." default:"0.0.0.0:22"`
-	Identity     string `short:"i" long:"identity" description:"Private key to identify server with." default:"~/.ssh/id_rsa"`
-	PasswordMode bool   `short:"p" long:"password_mode" description:"Enable mandatory password mode"`
-	Whitelist    string `long:"whitelist" description:"Optional file of public keys who are allowed to connect."`
-}
 
 /*
 TODO:
+	+ allow or disallow registration
 	+ keys for users
+	+ passphrase support
+	+ allowed ips
 	+ add rooms
 	+ add personal messages
-	+ @username
-	+ cached passwords
-	+ setting up the number of threads for a room
-	+ notif that this username is used
-	+ notif that user connected or disconnected
+	+ @username and color names
+	+ setting up the number of threads for a room (?)
+	+ notif that this username is used in other session
+	+ notif that user connected (join room) or disconnected
 	+ show message for joining users about online
+	+ authentificator (Google or another)
 */
 
 func main() {
 	// parse arguments
-	var options Options
-	_, err := flags.ParseArgs(&options, os.Args)
+	err := options.ParceOptions()
 	if err != nil {
 		log.Fatalln(err)
 	}
 	// print logo
 	utils.PrintRandomLogo(os.Stdout)
 	// get server privkey from file
-	privateKey, err := ioutil.ReadFile(options.Identity)
+	privateKey, err := ioutil.ReadFile(options.Settings.Identity)
 	if err != nil {
 		log.Println(err)
 		return
 	}
 	// create server
-	server, err := server.NewServer(privateKey, options.PasswordMode, options.Whitelist)
+	server, err := server.NewServer(privateKey, options.Settings.PasswordMode, options.Settings.Whitelist != "")
 	if err != nil {
 		log.Println(err)
 		return
 	}
 	// start server
-	done, err := server.Start(options.Host)
+	done, err := server.Start(options.Settings.Host)
 	if err != nil {
 		log.Println(err)
 		return

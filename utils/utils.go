@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io"
 	"math/rand"
-	"t_chat/structs"
+	"sssh/structs"
 	"time"
 )
 

@@ -4,22 +4,22 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"t_chat/rooms"
-	"t_chat/utils"
+	"sssh/rooms"
+	"sssh/utils"
 
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/terminal"
 )
 
 // Create server config
-func NewServer(privateKey []byte, passwordMode bool, whitelist_dir string) (*Server, error) {
+func NewServer(privateKey []byte, passwordMode bool, client_auth bool) (*Server, error) {
 	signer, err := ssh.ParsePrivateKey(privateKey)
 	if err != nil {
 		return nil, err
 	}
-
 	config := ssh.ServerConfig{
-		NoClientAuth: true,
+		NoClientAuth:      !client_auth,
+		PublicKeyCallback: validateKey,
 	}
 	config.AddHostKey(signer)
 
@@ -33,19 +33,16 @@ func NewServer(privateKey []byte, passwordMode bool, whitelist_dir string) (*Ser
 }
 
 func (s *Server) Start(laddr string) (<-chan struct{}, error) {
-	// Once a ServerConfig has been configured, connections can be
-	// accepted.
+	// Once a ServerConfig has been configured, connections can be accepted.
 	socket, err := net.Listen("tcp", laddr)
 	if err != nil {
 		return nil, err
 	}
-
 	s.socket = &socket
 	log.Printf("Listening on %s", laddr)
-
 	// create main room
 	rooms.CreateRoom("main")
-
+	// handle connnections
 	go func() {
 		for {
 			conn, err := socket.Accept()
@@ -54,14 +51,12 @@ func (s *Server) Start(laddr string) (<-chan struct{}, error) {
 				log.Printf("Failed to accept connection, aborting loop: %v", err)
 				return
 			}
-
 			// From a standard TCP connection to an encrypted SSH connection
 			sshConn, channels, requests, err := ssh.NewServerConn(conn, s.sshConfig)
 			if err != nil {
 				log.Printf("Failed to handshake: %v", err)
 				continue
 			}
-
 			log.Printf("Connection from: %s, %s, %s", sshConn.RemoteAddr(), sshConn.User(), sshConn.ClientVersion())
 
 			go ssh.DiscardRequests(requests)
