@@ -11,7 +11,7 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-// get whitelist keys
+// compare whitelist keys
 func compareKeyWithWhitelist(key ssh.PublicKey) error {
 	entites, err := os.ReadDir(options.Settings.Whitelist)
 	if err != nil {

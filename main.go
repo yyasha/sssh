@@ -1,12 +1,13 @@
 package main
 
 import (
-	"io/ioutil"
 	"log"
 	"os"
+	"os/user"
 	"sssh/options"
 	"sssh/server"
 	"sssh/utils"
+	"strings"
 )
 
 /*
@@ -23,6 +24,7 @@ TODO:
 	+ notif that user connected (join room) or disconnected
 	+ show message for joining users about online
 	+ authentificator (Google or another)
+	+ notifications
 */
 
 func main() {
@@ -34,7 +36,13 @@ func main() {
 	// print logo
 	utils.PrintRandomLogo(os.Stdout)
 	// get server privkey from file
-	privateKey, err := ioutil.ReadFile(options.Settings.Identity)
+	if strings.HasPrefix(options.Settings.Identity, "~/") {
+		user, err := user.Current()
+		if err == nil {
+			options.Settings.Identity = strings.Replace(options.Settings.Identity, "~", user.HomeDir, 1)
+		}
+	}
+	privateKey, err := os.ReadFile(options.Settings.Identity)
 	if err != nil {
 		log.Println(err)
 		return
